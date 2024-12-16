@@ -1,0 +1,90 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+   Chatbot
+{% endblock %}
+
+{% block content %}
+<section>
+    <h2 style="color: #D8C4B6; margin: 20px 0; font-size: 55px;">Conversation</h2>
+    <div id="posts-container">
+        {% if posts %}
+            {% for post in posts %}
+            <div class="post">
+                <strong>{{ post.author }}</strong>: {{ post.content }} <br><small><i>{{ post.get_local_timestamp }}</i></small>
+                {% if post.bot_response %}
+                <div class="bot-response">
+                    <strong>Bot:</strong> {{ post.bot_response }} <br><small><i>{{ post.bot_timestamp }}</i></small>
+                </div>
+                {% endif %}
+                <hr>
+            </div>
+            {% empty %}
+            {% endfor %}
+        {% else %}
+        <p id="no-messages" style="font-size: 30px;">
+            No messages yet. Say Hello!
+        </p>
+        
+        {% endif %}
+    </div>
+
+    <form id="post-form" class="form-with-validation" action="{% url 'posts:new-post' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %} 
+        {{ form }}
+        <button class="form-submit" type="submit" style="
+    margin-top: 1rem; 
+    padding: 0.75rem 1.5rem; 
+    background-color: #F5EFE7; 
+    color: #333; 
+    font-size: 1.2rem; 
+    font-weight: bold; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    transition: background-color 0.3s ease, transform 0.2s ease;
+" 
+onmouseover="this.style.backgroundColor='#D8C4B6'; this.style.transform='translateY(-2px)';"
+onmouseout="this.style.backgroundColor='#F5EFE7'; this.style.transform='translateY(0)';">
+    Submit
+</button>
+    </form>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    document.getElementById('post-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        axios.post(this.action, formData, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function(response) {
+            const postsContainer = document.getElementById('posts-container');
+            const newPost = document.createElement('div');
+            newPost.classList.add('post');
+            newPost.innerHTML = `
+               👤 <strong>${response.data.author}</strong>: ${response.data.content} <br><small><i>${new Date(response.data.timestamp).toLocaleString('en-PH')}</i></small><hr>
+               ${response.data.bot_response ? `<div class="bot-response"><strong>👩🏻 Bot:</strong> ${response.data.bot_response} <br><small><i>${response.data.bot_timestamp}</i></small></div>` : ''}
+               <hr>
+            `;
+            postsContainer.appendChild(newPost);
+
+            document.getElementById('post-form').reset();
+
+            const noMessages = document.getElementById('no-messages');
+            if (noMessages) {
+                noMessages.remove();
+            }
+        })
+        .catch(function(error) {
+            console.error('Error submitting the form:', error);
+        });
+    });
+</script>
+{% endblock %}

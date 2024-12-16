@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% load static %} <!-- Load the static files -->
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block content %}
+    <h1 style="color: #D8C4B6; text-align: center; font-size: 100px">ChatVault</h1>
+    <div style="text-align: center; margin: 20px;">
+        <!-- Correct path for the image -->
+        <img src="/static/chat.png" alt="ChatVault Logo" style="max-width: 200px; height: auto; margin: 20px 0;">
+    </div>
+    <p style="text-align: center; font-size: 20px">
+        ChatVault is a web app created with <strong>Python</strong> and <strong>Django</strong>. <br>
+        You can connect with a smart AI chatbot after logging in with your account. <br>
+        Conversations are lively and tailored to your needs. <br>
+        Experience modern communication powered by strong technology and clever design.
+    </p>
+{% endblock %}
